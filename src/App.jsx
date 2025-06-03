@@ -7,7 +7,6 @@ import NotFound from './components/Common/NotFound';
 import AuthMain from './components/Auth/AuthMain';
 import SignUp from './components/Auth/SignUp';
 import Feed from './pages/Feed';
-import { LogIn } from 'lucide-react';
 import Login from './Components/Auth/Login';
 
 function App() {
@@ -15,7 +14,6 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          {/* Public Routes */}
           <Route path="/" element={<AuthMain />} />
           <Route path="/signin" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />

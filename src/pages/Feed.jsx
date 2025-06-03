@@ -4,6 +4,7 @@ import PostList from "../components/feedcomponent/PostList";
 import { Sidebar } from "../components/feedcomponent/sidebar";
 
 function Feed() {
+  
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top Header - fixed position for better mobile experience */}

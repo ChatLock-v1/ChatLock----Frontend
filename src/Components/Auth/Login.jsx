@@ -1,155 +1,192 @@
-import React, { useState } from "react"
-import { AlertCircle, Github } from "lucide-react"
-import Loading from "../Loding"
-import { Link } from "react-router-dom"
-
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, AlertCircle, Github } from 'lucide-react';
+import Loading from '../Loding';
+import { context } from '../../context/UserContext';
+import axios from 'axios';
 
 export default function Login() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
 
-  const onSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-    if (!email || !password) {
-      setError("Please fill in all fields")
-      return
+  const { serverUrl, socket } = useContext(context);
+
+  // Detect device info (basic example)
+  const deviceInfo = navigator.userAgent;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
     }
+
+    if (!serverUrl) {
+      setError('Server URL is not defined. Please try again later.');
+      return;
+    }
+
+    if (!socket?.id) {
+      console.warn('⚠️ Socket not connected during login.');
+    }
+
+    setIsSubmitting(true);
 
     try {
-      setIsLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulated login
-      window.location.href = "/feed"
+      const data = {
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+        deviceInfo,
+        socketId: socket?.id || null,
+      };
+
+      const response = await axios.post(`${serverUrl}/login`, data);
+
+      console.log('✅ Login successful:', response.data);
+
+      // Save JWT token in localStorage
+      localStorage.setItem('chatlock_token', response.data.token);
+
+      // Emit socket event to register user socket
+      if (socket && response.data?.user?.id) {
+        socket.emit('registerSocket', response.data.user.id);
+      }
+
+      // Redirect to homepage or dashboard
+      navigate('/dashboard'); // adjust route as needed
+
     } catch (err) {
-      setError("Invalid email or password")
-    } finally {
-      setIsLoading(false)
+      console.error('❌ Login error:', err.response?.data || err.message);
+      setError(err.response?.data?.message || 'Something went wrong.');
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 bg-gradient-to-b from-purple-50 to-white">
-      {/* Page Title */}
-
-      <div className="w-full max-w-md bg-white shadow-md rounded-2xl p-6 space-y-6">
-        {/* Brand Logo and Welcome */}
-        <div className="text-center space-y-2">
-          <Link href="/" className="inline-block">
-            <h2 className="text-3xl font-bold tracking-tight text-purple-900">ChatLock</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-100 to-white px-4 py-8">
+      <div className="w-full max-w-md bg-white shadow-md rounded-xl p-5 space-y-5 relative">
+        <div className="text-center space-y-3">
+          <Link to="/" className="inline-block">
+            <h2 className="text-2xl font-bold text-purple-900">ChatLock</h2>
           </Link>
-          <h3 className="text-xl font-semibold tracking-tight">Welcome back</h3>
-          <p className="text-sm text-gray-500">Sign in to your account to continue</p>
+          <h3 className="text-lg font-semibold">Welcome Back to ChatLock</h3>
+          <p className="text-sm text-gray-500">Sign in to continue</p>
         </div>
 
-        {/* Error Message */}
         {error && (
-          <div className="flex items-center gap-2 bg-red-100 text-red-800 p-3 rounded-md text-sm">
+          <div className="flex items-center gap-2 bg-red-100 text-red-800 p-2 rounded-md text-xs">
             <AlertCircle className="w-4 h-4" />
             <span>{error}</span>
           </div>
         )}
 
-        {/* Sign In Form */}
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
-              id="email"
               type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm"
               placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
               required
-              className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              disabled={isSubmitting}
             />
           </div>
 
           <div>
-            <div className="flex items-center justify-between">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <a href="/forgot-password" className="text-xs text-purple-600 hover:underline">
-                Forgot password?
-              </a>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full p-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm"
+                placeholder="••••••••"
+                required
+                disabled={isSubmitting}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute top-2 right-2 text-gray-500 hover:text-purple-600"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              required
-              className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
+            <p className="text-xs text-gray-500 mt-1">
+              Use at least 8 characters including a number & special character.
+            </p>
           </div>
 
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-md flex items-center justify-center transition-all duration-200"
+            disabled={isSubmitting}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-md flex items-center justify-center transition-colors duration-200 text-sm"
           >
-            {isLoading ? (
+            {isSubmitting ? (
               <>
                 <Loading className="w-4 h-4 mr-2" />
                 Signing in...
               </>
             ) : (
-              "Sign In"
+              'Sign In'
             )}
           </button>
         </form>
 
-        {/* Divider */}
         <div className="flex items-center gap-2">
           <div className="flex-1 h-px bg-gray-300" />
-          <span className="text-xs text-gray-500 uppercase">Or continue with</span>
+          <span className="text-xs text-gray-500">Or continue with</span>
           <div className="flex-1 h-px bg-gray-300" />
         </div>
 
-        {/* OAuth Buttons */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <button
-            disabled={isLoading}
-            onClick={() => {}}
-            className="flex items-center justify-center border border-gray-300 rounded-md p-2 hover:bg-gray-50"
+            disabled={isSubmitting}
+            onClick={() => alert('Google login not implemented yet')}
+            className="flex items-center justify-center border border-gray-300 rounded-md p-2 hover:bg-gray-50 text-sm"
           >
-            <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-              <path d="M1 1h22v22H1z" fill="none" />
-            </svg>
-            Google
+            <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google" className="w-4 h-4" />
+            <span className="ml-2">Google</span>
           </button>
 
           <button
-            disabled={isLoading}
-            onClick={() => {}}
-            className="flex items-center justify-center border border-gray-300 rounded-md p-2 hover:bg-gray-50"
+            disabled={isSubmitting}
+            onClick={() => alert('GitHub login not implemented yet')}
+            className="flex items-center justify-center border border-gray-300 rounded-md p-2 hover:bg-gray-50 text-sm"
           >
-            <Github className="mr-2 h-4 w-4" />
-            GitHub
+            <Github className="w-4 h-4" />
+            <span className="ml-2">GitHub</span>
           </button>
         </div>
-      </div>
 
-      {/* Footer Text */}
-      <div className="text-center text-sm mt-4">
-        <p className="text-gray-500">
-          Don&apos;t have an account?{" "}
-          <Link to="/signup" className="font-medium text-purple-600 hover:text-purple-500">
-            Sign up
-          </Link>
-        </p>
+        <div className="text-center text-xs mt-4">
+          <p className="text-gray-500">
+            Don’t have an account?{" "}
+            <Link to="/signup" className="font-medium text-purple-600 hover:text-purple-500">
+              Sign Up
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
-  )
+  );
 }
