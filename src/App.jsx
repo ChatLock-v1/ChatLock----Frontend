@@ -8,6 +8,7 @@ import MainLayout from './pages/MainLayout';
 import { Home } from './pages/Home';
 import Signup from './components/Auth/SignUp';
 
+
 const BrowserRouter = createBrowserRouter([
   {
     path:'/',
@@ -30,6 +31,7 @@ const BrowserRouter = createBrowserRouter([
    {
     path:'/signup',
     element:<Signup></Signup>
+   }
 ])
 
 function App() {
