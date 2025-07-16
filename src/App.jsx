@@ -9,6 +9,7 @@ import Mainlayout from './pages/Mainlayout';
 import { Home } from './pages/Home';
 import Signup from './components/Auth/SignUp';
 
+
 const BrowserRouter = createBrowserRouter([
   {
     path:'/',
@@ -41,7 +42,7 @@ function App() {
     <div className="App">
       {/* <Router>
         <Routes>
-          <Route path="/" element={<AuthMain />} />
+          <Route path=" element={<AuthMain />} />
           <Route path="/sigdnin" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/feed" element={<Feed />} />
