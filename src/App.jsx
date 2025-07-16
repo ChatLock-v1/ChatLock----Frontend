@@ -42,7 +42,7 @@ function App() {
     <div className="App">
       {/* <Router>
         <Routes>
-          <Route path="/" element={<AuthMain />} />
+          <Route path=" element={<AuthMain />} />
           <Route path="/sigdnin" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/feed" element={<Feed />} />
