@@ -66,7 +66,7 @@ function Post() {
         <div className='flex item-center gap-3'>
           <FaRegHeart size={'22px'}></FaRegHeart>
           <MessageCircle onClick={()=>setOpen(true)} className='cursor-pointer hover:text-gray-600'></MessageCircle>
-          <Send></Send>
+          <Send ></Send>
         </div>
         <Bookmark className='cursor-pointer hover:text-gray-600'></Bookmark>
       </div>
@@ -76,8 +76,8 @@ function Post() {
         <span className='font-meduim mr-2'>username</span>
         caption
       </p>
-      <span>View all 10 comments</span>
-      <CommentDialog></CommentDialog>
+      <span onClick={()=>setOpen(true)} className='cursor-pointer text-sm gray-400'>  View all 10 comments</span>
+      <CommentDialog open={open} setOpen={setOpen}></CommentDialog>
 
       <div className='flex items-center justify-between'>
         <input type="text" placeholder='Add a comment...' className='outline-none text-sm w-full' value={text} onChange={changeEventHandler} />
