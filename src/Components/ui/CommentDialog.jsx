@@ -41,6 +41,7 @@ function CommentDialog({ open, setOpen }) {
             objectFit: 'contain',
           }}
         />
+        <h1>baby</h1>
       </DialogContent>
     </Dialog>
   )
