@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Loading from '../Loding';
 
 
-function AuthMain() {
+function Authmain() {
   const [isLoading, setIsLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ function AuthMain() {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      navigate("/feed"); 
+      navigate("/signin"); 
     }, 1500);
   };
 
@@ -73,7 +73,7 @@ function AuthMain() {
             <motion.h1 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="text-5xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent"
+              className="text-5xl font-serif font-bold tracking-tight bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent"
             >
               ChatLock
             </motion.h1>
@@ -125,4 +125,4 @@ function AuthMain() {
   );
 }
 
-export default AuthMain;
+export default Authmain;

@@ -1,37 +1,56 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './App.css';
 
-// import Feed from './Components/Feed/Feed';
-// import ProtectedRoute from './Components/Auth/ProtectedRoute';
-import NotFound from './components/Common/NotFound';
-import Login from './components/Auth/Login';
-import AuthMain from './components/Auth/AuthMain';
-import SignUp from './components/Auth/SignUp';
+
+import Authmain from './Components/Auth/Authmain'
+
+import Login from './Components/Auth/Login';
+import Mainlayout from './pages/Mainlayout';
+import { Home } from './pages/Home';
+import Signup from './components/Auth/SignUp';
+
+
+const BrowserRouter = createBrowserRouter([
+  {
+    path:'/',
+    element:<Mainlayout></Mainlayout>,
+    children:[
+      {
+        path:'/',
+        element:<Home></Home>
+      }
+    ]
+  },
+     {
+    path:'/auth',
+    element:<Authmain></Authmain>
+   },
+   {
+    path:'/signin',
+    element:<Login></Login>
+   },
+   {
+    path:'/signup',
+    element:<Signup></Signup>
+
+   }
+
+])
 
 function App() {
   return (
     <div className="App">
-      <Router>
+      {/* <Router>
         <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<AuthMain />} />
-          <Route path="/signin" element={<Login />} />
+          <Route path=" element={<AuthMain />} />
+          <Route path="/sigdnin" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
-          
-          {/* Protected Routes */}
-          {/* <Route 
-            path="/feed" 
-            element={
-              
-                // <Feed />
-          
-            } 
-          /> */}
-          
-          {/* 404 Not Found */}
+          <Route path="/feed" element={<Feed />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </Router>
+      </Router> */}
+          {/* <Route path="/" element={<AuthMain />} /> */}
+<RouterProvider router={BrowserRouter}></RouterProvider>
     </div>
   );
 }
