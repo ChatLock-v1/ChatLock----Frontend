@@ -3,7 +3,9 @@ import React from "react";
 const CreatePost = ({open, setOpen}) => {
   return (
     <Dialog open={open}>
-        <DialogTitle>Create a New Post</DialogTitle>
+
+        <DialogTitle>Create- Roshni- a New Post</DialogTitle>
+
         <DialogContent>
             <DialogContentText>
                 To create a new post, please enter the title and content of your post.
